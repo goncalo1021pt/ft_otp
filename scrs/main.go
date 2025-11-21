@@ -6,17 +6,26 @@ import (
 )
 
 func main() {
-	generateFile, keyFile, err := parseArgs()
+	generateFile, keyFile, qrFlag, webFlag, err := parseArgs()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "./ft_otp: error: %v\n", err)
 		os.Exit(1)
 	}
 
-	if generateFile != "" {
-		if err := handleGenerateMode(generateFile); err != nil {
+	if webFlag {
+		if err := handleWebMode(); err != nil {
 			fmt.Fprintf(os.Stderr, "./ft_otp: error: %v\n", err)
 			os.Exit(1)
 		}
+		return
+	}
+
+	if generateFile != "" {
+		if err := handleGenerateMode(generateFile, qrFlag); err != nil {
+			fmt.Fprintf(os.Stderr, "./ft_otp: error: %v\n", err)
+			os.Exit(1)
+		}
+
 	}
 
 	if keyFile != "" {

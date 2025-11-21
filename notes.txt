@@ -1,0 +1,7 @@
+TOTP Algo steps:
+1. Get current time counter (Unix time / 30 seconds)
+2. Convert counter to 8-byte big-endian byte array
+3. Compute HMAC-SHA1 of secret key and counter bytes
+4. Dynamic truncation to get a 4-byte string
+5. Convert to integer and mod 10^6 to get 6-digit code
+6. Format as zero-padded 6-digit string

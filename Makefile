@@ -1,7 +1,6 @@
 NAME = ft_otp
 
-SRCS = $(addprefix $(SRCS_DIR), $(S))
-S = main.go parser.go exec.go
+SRCS = $(wildcard $(SRCS_DIR)*.go)
 SRCS_DIR = scrs/
 
 GOFLAGS = 
@@ -26,6 +25,7 @@ clean:
 fclean: clean
 	@rm -f $(NAME)
 	@rm -f ft_otp.key
+	@rm -f qrcode.png
 	@echo "$(RED)$(NAME)$(NC) Removed."
 
 re: fclean all

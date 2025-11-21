@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ft_otp - TOTP Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        .totp-display {
+            background: #f7f7f7;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .totp-code {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .timer {
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 1s linear;
+        }
+        .qr-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+        .qr-section h2 {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        .qr-code {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .qr-code img {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .error {
+            color: #e74c3c;
+            padding: 20px;
+            background: #ffeaea;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .loading {
+            color: #667eea;
+            font-size: 1.2em;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 ft_otp</h1>
+        <div class="totp-display">
+            <div id="totp-code" class="totp-code loading">Loading...</div>
+            <div id="timer" class="timer">--s remaining</div>
+            <div class="progress-bar">
+                <div id="progress" class="progress-fill" style="width: 100%"></div>
+            </div>
+        </div>
+        
+        <div class="qr-section">
+            <h2>Scan with Authenticator app</h2>
+            <div class="qr-code">
+                <img id="qr-image" src="/qrcode" alt="QR Code" onerror="this.parentElement.innerHTML='<div class=error>QR Code not available. Generate one with --qr flag</div>'">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let totpCode = '';
+        let expiresAt = 0;
+
+        async function fetchTOTP() {
+            try {
+                const response = await fetch('/api/totp');
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('totp-code').innerHTML = '<div class="error">' + data.error + '</div>';
+                    return;
+                }
+                
+                totpCode = data.code;
+                expiresAt = data.expires_at;
+                document.getElementById('totp-code').textContent = totpCode;
+                updateTimer();
+            } catch (error) {
+                document.getElementById('totp-code').innerHTML = '<div class="error">Failed to fetch TOTP</div>';
+            }
+        }
+
+        function updateTimer() {
+            const now = Math.floor(Date.now() / 1000);
+            const remaining = expiresAt - now;
+            
+            if (remaining <= 0) {
+                fetchTOTP();
+                return;
+            }
+            
+            document.getElementById('timer').textContent = remaining + 's remaining';
+            
+            const progress = (remaining / 30) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            
+            if (remaining <= 5) {
+                document.getElementById('progress').style.background = 'linear-gradient(90deg, #e74c3c 0%, #c0392b 100%)';
+            } else {
+                document.getElementById('progress').style.background = 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)';
+            }
+        }
+
+        fetchTOTP();
+        setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
