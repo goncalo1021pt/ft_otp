@@ -4,6 +4,9 @@ ft_otp
 # Generated key file
 ft_otp.key
 
+#qr code images
+qrcode.png
+
 # Test files
 key.hex
 key.txt
