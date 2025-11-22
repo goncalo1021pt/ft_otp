@@ -93,10 +93,14 @@ func overlayLogo(qrPath, logoPath, outputPath string) error {
 
 // generateQRWithLogo generates a QR code with 42 logo overlay
 func generateQRWithLogo(secret []byte, outputPath, logoPath string) error {
-	uri := generateTOTPURI(secret, "user", "ft_otp")
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = "user"
+	}
+	uri := generateTOTPURI(secret, hostname, "ft_otp")
 
 	tempQR := "temp_qr.png"
-	err := generateQRCode(uri, tempQR)
+	err = generateQRCode(uri, tempQR)
 	if err != nil {
 		return err
 	}
