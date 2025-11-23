@@ -184,7 +184,7 @@ This project is part of the 42 Cybersecurity Piscine curriculum.
 
 ## Author
 
-**Gonçalo Pinto**
+**Gonçalo Pereira**
 - GitHub: [@goncalo1021pt](https://github.com/goncalo1021pt)
 
 ## Acknowledgments
